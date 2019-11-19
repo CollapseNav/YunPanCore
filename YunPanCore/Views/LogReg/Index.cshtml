@@ -1,0 +1,115 @@
+@{
+Layout = null;
+}
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    <link rel="stylesheet" href="~/Layui/css/layui.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    <style>
+
+    </style>
+
+</head>
+
+<body class="layui-layout-body Loginbody">
+    <div class="middle logreg-body">
+        <form class="layui-form form-box front">
+            @Html.AntiForgeryToken()
+            <div>
+                <h1>Login</h1>
+            </div>
+            <div>
+                <input class="layui-input input-normal" type="text" placeholder="UserAccount or UserName"
+                    name="useraccount" />
+                <input class="layui-input input-normal" type="password" placeholder="PassWord" name="password" />
+                <button type="submit" lay-submit="" lay-filter="login" class="layui-btn btn-submit">LOGIN</button>
+            </div>
+            <div>
+                <p style="margin-top: 40px">If you don't have account.Please</p>
+                <p> Click here to <a id="signup">Sign Up</a></p>
+            </div>
+        </form>
+        <form class="layui-form form-box back">
+            @Html.AntiForgeryToken()
+            <div>
+                <h1>Register</h1>
+            </div>
+            <div>
+                <input class="layui-input input-normal" type="text" placeholder="UserAccount(Email)"
+                    name="useraccount" />
+                <input class="layui-input input-normal" type="password" placeholder="PassWord" name="password" />
+                <button type="submit" lay-submit="" lay-filter="register" class="layui-btn btn-submit">Sign In</button>
+            </div>
+            <div>
+                <p style="margin-top: 40px">Have a account ? You can</p>
+                <p> Click here to <a id="login">Log in</a></p>
+            </div>
+        </form>
+    </div>
+    <script src="~/Layui/layui.js"></script>
+    <script>
+        layui.use(["element", "form"],
+            function () {
+                var element = layui.element;
+                var layer = parent.layer === undefined ? layui.layer : parent.layer,
+                    $ = layui.jquery;
+                var form = layui.form;
+                $("#signup").click(function () {
+                    $(".logreg-body").toggleClass("middle-flip");
+                });
+                $("#login").click(function () {
+                    $(".logreg-body").toggleClass("middle-flip");
+                });
+                form.on('submit(login)',
+                    function (data) {
+                        $.post("/LogReg/Login",
+                            data.field,
+                            function (result) {
+                                if (result == "1")
+                                    location.href = "/UserFile/AllFile";
+                                else if (result == "0")
+                                    layer.msg("密码错误！", {
+                                        anim: 6,
+                                        icon: 2,
+                                        time: 1500
+                                    });
+                                else
+                                    layer.msg("账户不存在！", {
+                                        anim: 6,
+                                        icon: 2,
+                                        time: 1500
+                                    });
+                            });
+                        return false;
+                    });
+                form.on('submit(register)',
+                    function (data) {
+                        $.post("/LogReg/Register",
+                            data.field,
+                            function (result) {
+                                if (result == "0")
+                                    location.href = "/LogReg/Index";
+                                else if (result == "1")
+                                    layer.msg("该用户名已存在", {
+                                        anim: 6,
+                                        icon: 2,
+                                        time: 1500
+                                    });
+                                else if (result == "-1")
+                                    layer.msg("注册失败", {
+                                        anim: 6,
+                                        icon: 2,
+                                        time: 1500
+                                    });
+                            });
+                        return false;
+                    });
+            });
+    </script>
+</body>
+
+</html>

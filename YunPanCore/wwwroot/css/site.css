@@ -1,0 +1,144 @@
+﻿.Loginbody {
+  margin: 0;
+  padding: 0;
+  background: darkslategrey;
+  font-family: sans-serif;
+}
+
+.logreg-body {
+  height: 440px;
+  width: 400px;
+}
+
+.middle {
+  top: 50%;
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+}
+
+.form-box {
+  width: 100%;
+  height: 100%;
+  margin: auto;
+  background: darkcyan;
+  border-radius: 40px;
+}
+
+.input-normal[type="text"],
+.input-normal[type="password"] {
+  width: 220px;
+  height: 38px;
+  margin: 30px auto;
+  padding: 0;
+  text-align: center;
+  border-radius: 20px;
+  outline: none;
+  display: block;
+  transition: 0.3s;
+  border: 1px solid #e6e6e6;
+}
+
+.input-normal[type="text"]:focus,
+.input-normal[type="password"]:focus {
+  width: 320px;
+}
+
+h1 {
+  text-align: center;
+  color: cornsilk;
+  font-size: 32px;
+  margin-top: 30px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.btn-submit {
+  width: 100px;
+  height: 36px;
+  margin: 0 auto;
+  font-size: 18px;
+  text-align: center;
+  color: white;
+  border: 0;
+  border-radius: 20px;
+  display: block;
+  background: darkslategrey;
+  transition: 0.3s;
+}
+
+.btn-submit:hover {
+  background: darkseagreen;
+  width: 150px;
+  transition: 0.2s;
+}
+
+p {
+  margin: 15px auto;
+  padding: 0;
+  font-size: 16px;
+  color: white;
+  display: block;
+  text-align: center;
+}
+
+a {
+  color: aqua;
+  cursor: pointer;
+}
+
+.front {
+  transform: perspective(600px) rotateY(0deg);
+}
+
+.back {
+  transform: perspective(600px) rotateY(-180deg);
+}
+
+
+.front,
+.back {
+  overflow: hidden;
+  position: absolute;
+  backface-visibility: hidden;
+  transition: 0.3s linear;
+}
+
+.middle-flip .front {
+  transform: perspective(600px) rotateY(180deg);
+}
+
+.middle-flip .back {
+  transform: perspective(600px) rotateY(0deg);
+}
+
+.slider-text {
+  margin-left: 15px;
+  font-size: 16px;
+  height: 100%;
+  width: 100%;
+}
+
+.topbar-text {
+  font-size: 15px;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 900;
+  color: cornflowerblue;
+  letter-spacing: 3px;
+}
+
+.table-header {
+  border: solid aqua;
+  border-radius: 20px;
+  width: 100%;
+}
+
+.info-page {
+  border-radius: 20px;
+  border: 1px solid black;
+  padding: 40px;
+  width: 20%;
+}

@@ -1,0 +1,64 @@
+@{
+Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="layui-col-md2">
+    <div class="layui-side layui-bg-black" style="height: 100%">
+        <div class="layui-side-scroll">
+            <ul class="layui-nav layui-nav-tree" lay-filter="leftside">
+                <li class="layui-nav-item">
+                    <a>
+                        <i class="layui-icon layui-icon-home" style="font-size: 20px"></i>
+                        <span class="slider-text">个人信息</span>
+                    </a>
+                </li>
+                <li class="layui-nav-item">
+                    <a target="Video">
+                        <i class="layui-icon layui-icon-video" style="font-size: 20px"></i>
+                        <span class="slider-text">修改密码</span>
+                    </a>
+                </li>
+                <!-- <li class="layui-nav-item">
+                    <a target="Image">
+                        <i class="layui-icon layui-icon-picture" style="font-size: 20px"></i>
+                        <span class="slider-text">图片文件</span>
+                    </a>
+                </li>
+                <li class="layui-nav-item">
+                    <a target="Sound">
+                        <i class="layui-icon layui-icon-headset" style="font-size: 20px"></i>
+                        <span class="slider-text">音频文件</span>
+                    </a>
+                </li>
+                <li class="layui-nav-item">
+                    <a target="Doc">
+                        <i class="layui-icon layui-icon-file" style="font-size: 20px"></i>
+                        <span class="slider-text">文档文件</span>
+                    </a>
+                </li>
+                <li class="layui-nav-item">
+                    <a target="Zip">
+                        <i class="layui-icon layui-icon-spread-left" style="font-size: 20px"></i>
+                        <span class="slider-text">压缩文件</span>
+                    </a>
+                </li>
+                <li class="layui-nav-item">
+                    <a target="">
+                        <i class="layui-icon layui-icon-face-surprised" style="font-size: 20px"></i>
+                        <span class="slider-text">无法名状</span>
+                    </a>
+                </li>
+                <li class="layui-nav-item">
+                    <a target="Shared">
+                        <i class="layui-icon layui-icon-link" style="font-size: 20px"></i>
+                        <span class="slider-text">我的分享</span>
+                    </a>
+                </li> -->
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="layui-body">
+    <div class="middle info-page">
+        @RenderBody()
+    </div>
+</div>
