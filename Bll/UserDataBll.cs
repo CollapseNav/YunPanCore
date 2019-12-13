@@ -10,6 +10,21 @@ namespace Bll
         {
         }
 
+        public bool CheckFileSize(string filesize, string userid)
+        {
+            var item = req.FindSingle(m => m.Id == userid);
+            var uploadFileSize = long.Parse(filesize);
+            var usedSize = long.Parse(item.Stored ?? "0");
+            var maxSize = long.Parse(item.Cap);
+            return uploadFileSize + usedSize < maxSize;
+        }
+
+        public void AddFile(string filesize, string userid)
+        {
+            var item = req.FindSingle(m => m.Id == userid);
+            req.Update(m => m.Id == userid, u => new UserDataInfo { Stored = (long.Parse(filesize) + long.Parse(item.Stored ?? "0")).ToString() });
+        }
+
         public UserDataInfo LoginCheck(UserDataInfo user, out bool IsExist)
         {
             IsExist = false;
@@ -38,6 +53,8 @@ namespace Bll
         {
             if (UserNameExist(u.UserName)) return false;
             u.FolderPath = "/" + u.UserName;
+            //10G
+            u.Cap = "10737418240‬";
             try
             {
                 req.Add(u);
@@ -71,11 +88,6 @@ namespace Bll
         public UserDataInfo GetUserDataById(string id)
         {
             return req.FindByID(id);
-        }
-
-        public void EditUserData(UserDataInfo userdata)
-        {
-            req.Update(m => m.UserName == userdata.UserName, m => userdata);
         }
     }
 }

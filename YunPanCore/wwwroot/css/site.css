@@ -137,8 +137,8 @@ a {
 }
 
 .info-page {
+  height: 80%;
+  width: 50%;
   border-radius: 20px;
-  border: 1px solid black;
   padding: 40px;
-  width: 20%;
 }
