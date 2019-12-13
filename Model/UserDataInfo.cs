@@ -69,6 +69,9 @@ namespace Model
         [MaxLength(64)]
         public string Cap { get; set; }
 
+        [MaxLength(64)]
+        public string Stored { get; set; }
+
         public virtual ICollection<FileInfo> UserFiles { get; set; }
     }
 }

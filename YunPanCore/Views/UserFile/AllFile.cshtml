@@ -19,11 +19,11 @@
     <script type="text/html" id="FileToolBar">
         <button class="layui-btn layui-btn-sm" lay-event="newfolder">新建文件夹</button>
         <button class="layui-btn layui-btn-sm" id="UploadBtn" lay-event="upload">上传</button>
-        <div style="display: inline-table;overflow: hidden;position: relative;bottom: 0%;">
+        <!-- <div style="display: inline-table;overflow: hidden;position: relative;bottom: 0%;">
             <span class="layui-btn layui-btn-sm">上传文件夹</span>
             <input class="uploadfile" style="position: absolute;right: 0;top: 0;opacity: 0;" type="file"
                 id="UploadFiles" multiple webkitdirectory />
-        </div>
+        </div> -->
     </script>
 
     <script>
@@ -69,10 +69,9 @@
                             sort: true,
                             unresize: true
                         }, {
-                            fixed: "right",
                             title: "操作",
                             toolbar: "#tablebar",
-                            width: '15%',
+                            width: '30%',
                             unresize: true
                         }, {
                             field: 'FileType',
@@ -90,16 +89,6 @@
                             field: 'OwnerName',
                             title: '所有者',
                             width: '10%',
-                            unresize: true
-                        }, {
-                            field: 'ChangedDate',
-                            sort: true,
-                            title: '修改时间',
-                            templet: function (date) {
-                                return util.toDateString(date.ChangedDate,
-                                    'yyyy-MM-dd HH:mm:ss');
-                            },
-                            width: '15%',
                             unresize: true
                         }
                     ]
@@ -132,6 +121,18 @@
                     elem: '#UploadBtn',
                     url: '/UserFile/Upload',
                     accept: 'file',
+                    auto: false,
+                    choose: function (obj) {
+                        obj.preview(function (index, file, result) {
+                            var filesize = file.size;
+                            $.post('/UserFile/CheckSize', { 'size': filesize }, function (res) {
+                                if (res == '1')
+                                    obj.upload(index, file);
+                                else
+                                    layer.msg('容量不足');
+                            })
+                        });
+                    },
                     done: function (res) {
                         if (res == '1') {
                             layer.msg('上传成功！');
@@ -246,25 +247,37 @@
             element.on('nav(leftside)', function (elem) {
                 fill.html('');
                 var value = elem.context.getAttribute('target');
-                if (elem.context.getAttribute('target') == null) {
-                    tablebody.reload({
-                        url: '/UserFile/InitAllFiles',
-                        where: {
-                            'folder': ''
-                        }
-                    })
-                } else if (value == 'Shared') {
-                    tablebody.reload({
-                        url: '/UserFile/GetSharedFiles',
-                        where: {}
-                    })
-                } else {
-                    tablebody.reload({
-                        url: '/UserFile/InitFilteFiles',
-                        where: {
-                            'filte': value
-                        }
-                    });
+                switch (value) {
+                    case 'Shared': {
+                        tablebody.reload({
+                            url: '/UserFile/GetSharedFiles',
+                            where: {}
+                        });
+                        break;
+                    }
+                    case null: {
+                        tablebody.reload({
+                            url: '/UserFile/InitAllFiles',
+                            where: {
+                                'folder': ''
+                            }
+                        });
+                        break;
+                    }
+                    case 'Deleted': {
+                        tablebody.reload({
+                            url: '/UserFile/GetDeletedFile',
+                        })
+                        break;
+                    }
+                    default: {
+                        tablebody.reload({
+                            url: '/UserFile/InitFilteFiles',
+                            where: {
+                                'filte': value
+                            }
+                        });
+                    }
                 }
                 setTimeout(() => {
                     InitFill();

@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Bll;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Util;
 
 namespace YunPanCore.Controllers
 {
@@ -36,7 +37,7 @@ namespace YunPanCore.Controllers
         public string GetUserData()
         {
             var data = _user.GetUserDataById(User.FindFirst(m => m.Type == "UserId").Value);
-            return Util.SerializeData(data);
+            return LayuiData.SerializeData(data);
         }
     }
 }

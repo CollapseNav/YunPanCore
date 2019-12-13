@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Security.Cryptography;
-using System.Linq;
-using Microsoft.AspNetCore.Http;
-using Bll;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Authorization;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
+using Bll;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.Extensions.FileProviders;
+using Util;
 
 namespace YunPanCore.Controllers
 {
@@ -20,15 +20,14 @@ namespace YunPanCore.Controllers
 
         private readonly UserDataBll _userdata;
 
-        private readonly Dictionary<string, string> FileFilter = new Dictionary<string, string>{
-            {"Video",".mp4,.wmv,.rmvb"},
-            {"Image",".jpg,.png"},
-            {"Sound",".mp3"},
-            {"Doc",".doc,.docx,.txt,.md"},
-            {"Zip",".zip,.rar,.7z"}
+        private readonly Dictionary<string, string> FileFilter = new Dictionary<string, string> { { "Video", ".mp4,.wmv,.rmvb" },
+            { "Image", ".jpg,.png" },
+            { "Sound", ".mp3" },
+            { "Doc", ".doc,.docx,.txt,.md,.pdf" },
+            { "Zip", ".zip,.rar,.7z" }
         };
 
-        private readonly string RootPath = @"D:/YunPanFiles";
+        private readonly string RootPath;
 
         private static string _currentFolder = string.Empty;
 
@@ -36,6 +35,7 @@ namespace YunPanCore.Controllers
         {
             _userfile = userFile;
             _userdata = userData;
+            RootPath = ConfigurationService.Configuration.GetSection("YunPanFilePath").Value;
         }
 
         [HttpGet]
@@ -44,11 +44,22 @@ namespace YunPanCore.Controllers
             return View();
         }
 
+        [HttpPost]
+        public string CheckSize(string size)
+        {
+            if (_userdata.CheckFileSize(size, User.FindFirst(u => u.Type == "UserId").Value))
+                return "1";
+            return "0";
+        }
 
         [HttpGet]
-        public IActionResult DeletedFile()
+        public string GetDeletedFile()
         {
-            return View();
+            var items = _userfile.GetDeletedFiles(User.FindFirst(u => u.Type == "UserId").Value).ToList();
+            items = items.Count > 0 ? items : new List<Model.FileInfo>();
+            // var data = LayuiData.LayuiTableData<Model.FileInfo>(items);
+            var data = LayuiData.LayuiTableData<Model.FileInfo>(items);
+            return data;
         }
 
         [HttpGet]
@@ -90,7 +101,7 @@ namespace YunPanCore.Controllers
                 items = _userfile.GetFilesWithNoFilter(filter.ToArray(), User.FindFirst(match => match.Type == "UserId").Value).ToList();
             }
             items = items.Count == 0 ? new List<Model.FileInfo>() : items;
-            string data = Util.LayuiTableData<Model.FileInfo>(items);
+            string data = LayuiData.LayuiTableData<Model.FileInfo>(items);
             return data;
         }
 
@@ -105,7 +116,7 @@ namespace YunPanCore.Controllers
         {
             var items = _userfile.GetUserFilesByUserName(User.FindFirst(m => m.Type == "UserName").Value, _currentFolder).ToList();
             items = items.Count == 0 ? new List<Model.FileInfo>() : items;
-            string data = Util.LayuiTableData<Model.FileInfo>(items);
+            string data = LayuiData.LayuiTableData<Model.FileInfo>(items);
             return data;
         }
 
@@ -116,22 +127,22 @@ namespace YunPanCore.Controllers
             IFormFile file = i.First();
             var filesize = file.Length;
             string filetype = file.FileName.Substring(file.FileName.LastIndexOf("."));
-            string filename = file.FileName.Replace(filetype, "");
+            string filename = file.FileName.Substring(file.FileName.LastIndexOf("\\") + 1);
+            string justname = filename.Replace(filetype, "");
             string filepath = RootPath + _currentFolder;
-            string ownerid = User.FindFirst(m => m.Type == "UserId").Value;
-            string fullname = filepath + "/" + file.FileName;
+            string fullname = filepath + "/" + filename;
             if (!Directory.Exists(filepath))
                 Directory.CreateDirectory(filepath);
             FileStream fs = new FileStream(fullname, FileMode.CreateNew);
             try
             {
                 await file.CopyToAsync(fs);
-                var hash = BitConverter.ToString(MD5.Create().ComputeHash(fs)).Replace("-", "");
-                var item = _userfile.IsFileExist(hash);
-                if (item != null)
-                    filepath = item.FilePath;
-
-                _userfile.AddFile(new Model.FileInfo { FileName = filename, FileType = filetype, FileSize = filesize.ToString(), FilePath = filepath, MapPath = _currentFolder, OwnerName = User.FindFirst(m => m.Type == "UserName").Value, OwnerId = ownerid, IsDeleted = 0, HashCode = hash });
+                // var hash = BitConverter.ToString(MD5.Create().ComputeHash(fs)).Replace("-", "");
+                // var item = _userfile.IsFileExist(hash);
+                // if (item != null)
+                //     filepath = item.FilePath;
+                _userfile.AddFile(new Model.FileInfo { FileName = justname, FileType = filetype, FileSize = filesize.ToString(), FilePath = filepath, MapPath = _currentFolder, OwnerName = User.FindFirst(m => m.Type == "UserName").Value, OwnerId = User.FindFirst(m => m.Type == "UserId").Value, IsDeleted = 0 });
+                _userdata.AddFile(filesize.ToString(), User.FindFirst(m => m.Type == "UserId").Value);
             }
             catch (IOException)
             {
@@ -140,17 +151,12 @@ namespace YunPanCore.Controllers
                 System.IO.File.Delete(fullname);
                 return "1";
             }
-            catch
+            catch (Exception ex)
             {
                 fs.Dispose();
                 fs.Close();
                 System.IO.File.Delete(fullname);
                 return "上传失败！";
-            }
-            finally
-            {
-                fs.Dispose();
-                fs.Close();
             }
             return "1";
         }
@@ -192,7 +198,7 @@ namespace YunPanCore.Controllers
             string id = User.FindFirst(m => m.Type == "UserId").Value;
             var items = _userfile.GetSharedFile(id).ToList();
             items = items.Count == 0 ? new List<Model.FileInfo>() : items;
-            var data = Util.LayuiTableData<Model.FileInfo>(items);
+            var data = LayuiData.LayuiTableData<Model.FileInfo>(items);
             return data;
         }
 
