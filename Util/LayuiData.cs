@@ -1,14 +1,11 @@
-using System.Linq;
-using System;
 using System.Collections.Generic;
 using System.Text;
 using Newtonsoft.Json;
 
-namespace YunPanCore
+namespace Util
 {
-    public class Util
+    public class LayuiData
     {
-
         public static string LayuiTableData<T>(List<T> items)
         {
             StringBuilder strB = new StringBuilder();
